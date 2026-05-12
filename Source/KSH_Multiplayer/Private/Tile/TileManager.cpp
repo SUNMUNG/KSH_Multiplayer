@@ -52,10 +52,15 @@ void ATileManager::GenerateGrid()
 			{
 				SpawnedTiles.Add(NewTile);
 
-				// 중앙 타일 태그 (0,0)
+				// (0,0) 좌표는 중앙 타일
 				if (x == 0 && y == 0)
 				{
 					NewTile->Tags.Add(FName("CenterTile"));
+					NewTile->InitHealth(13); // 중앙 타일은 13대 맞아야 부서짐
+				}
+				else
+				{
+					NewTile->InitHealth(3); // 일반 타일은 3대 맞아야 부서짐
 				}
 			}
 		}

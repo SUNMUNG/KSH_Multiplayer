@@ -11,6 +11,7 @@ UENUM(BlueprintType)
 enum class ETileState : uint8
 {
 	Normal		UMETA(DisplayName = "Normal"),
+	LittleCracked		UMETA(DisplayName = "LittleCracked"),
 	Cracked		UMETA(DisplayName = "Cracked"),
 	Destroyed	UMETA(DisplayName = "Destroyed")
 };
@@ -23,26 +24,35 @@ class KSH_MULTIPLAYER_API ARaidTile : public AActor
 public:
 	ARaidTile();
 
-	// 네트워크 동기화를 위한 필수 함수
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// 매니저가 스폰 직후 체력을 설정할 수 있도록 여는 함수
+	void InitHealth(int32 InMaxHealth);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UStaticMeshComponent* TileMesh;
 
-	// [핵심] 타일 상태가 변하면 OnRep_TileState 함수가 클라이언트에서 자동 호출됩니다.
+	// [추가] 타일의 체력 데이터
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Tile State")
+	int32 MaxHealth;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Tile State")
+	int32 CurrentHealth;
+
 	UPROPERTY(ReplicatedUsing = OnRep_TileState, BlueprintReadOnly, Category = "Tile State")
 	ETileState CurrentState;
 
 	UFUNCTION()
 	void OnRep_TileState();
 
-public:
-	// 메테오가 떨어졌을 때 서버에서만 호출될 함수
-	UFUNCTION(BlueprintCallable)
-	void TakeDamage();
+	// [추가] 체력 비율에 따라 상태를 결정하는 내부 함수
+	void UpdateStateBasedOnHealth();
 
-	// 머티리얼 색상 변경이나 파괴 이펙트 등은 블루프린트에서 편하게 작업하도록 열어둡니다.
+public:
+	UFUNCTION(BlueprintCallable)
+	void TakeDamage(int32 DamageAmount = 1);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Tile State")
 	void UpdateTileVisuals(ETileState NewState);
 };

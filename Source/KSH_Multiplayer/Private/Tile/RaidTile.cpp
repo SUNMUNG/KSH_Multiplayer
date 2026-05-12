@@ -1,17 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Tile/RaidTile.h"
 #include "Net/UnrealNetwork.h"
 
 ARaidTile::ARaidTile()
 {
-	PrimaryActorTick.bCanEverTick = false; // 타일은 매 프레임 Tick 연산이 필요 없으므로 최적화
-	bReplicates = true; // 멀티플레이어 환경에서 액터 복제 허용
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 
 	TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	RootComponent = TileMesh;
 
+	// 기본값 세팅 (매니저가 다시 덮어씌울 예정)
+	MaxHealth = 3;
+	CurrentHealth = 3;
 	CurrentState = ETileState::Normal;
 }
 
@@ -19,34 +19,78 @@ void ARaidTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// CurrentState 변수를 멀티플레이 네트워크로 동기화 등록
+	// 체력 변수들도 네트워크 동기화에 추가
+	DOREPLIFETIME(ARaidTile, MaxHealth);
+	DOREPLIFETIME(ARaidTile, CurrentHealth);
 	DOREPLIFETIME(ARaidTile, CurrentState);
 }
 
-void ARaidTile::TakeDamage()
+void ARaidTile::InitHealth(int32 InMaxHealth)
 {
-	// 오직 서버(Authority)에서만 타일의 상태를 변경할 수 있습니다.
 	if (HasAuthority())
 	{
-		if (CurrentState == ETileState::Normal)
-		{
-			CurrentState = ETileState::Cracked; // 1번 맞으면 금가기
-		}
-		else if (CurrentState == ETileState::Cracked)
-		{
-			CurrentState = ETileState::Destroyed; // 2번 맞으면 파괴
-			// 타일이 부서졌을 때 충돌 판정을 꺼서 플레이어가 떨어지게 만듭니다.
-			SetActorEnableCollision(false);
-		}
+		MaxHealth = InMaxHealth;
+		CurrentHealth = InMaxHealth;
+		UpdateStateBasedOnHealth();
+	}
+}
 
-		// 방장(서버 플레이어)의 화면도 갱신해주기 위해 수동으로 한 번 호출
+void ARaidTile::TakeDamage(int32 DamageAmount)
+{
+	// 서버에서만, 그리고 체력이 0보다 클 때만 데미지를 입습니다.
+	if (HasAuthority() && CurrentHealth > 0)
+	{
+		// 1씩 깎던 것을 들어온 데미지만큼 깎도록 변경
+		CurrentHealth -= DamageAmount;
+		UpdateStateBasedOnHealth();
+	}
+}
+
+// [핵심] 체력 비율(%)에 따른 상태 자동 계산 로직
+void ARaidTile::UpdateStateBasedOnHealth()
+{
+	ETileState NewState = ETileState::Normal;
+
+	if (CurrentHealth <= 0)
+	{
+		NewState = ETileState::Destroyed;
+		SetActorEnableCollision(false); // 부서지면 충돌 끄기
+	}
+	else
+	{
+		// 남은 체력의 비율 계산 (0.0 ~ 1.0)
+		float HealthRatio = (float)CurrentHealth / (float)MaxHealth;
+
+		// [비율 로직 분기]
+		// 3체력: 1남음(0.33) -> Cracked / 2남음(0.66) -> LittleCracked / 3남음(1.0) -> Normal
+		// 13체력: 1~4남음(0.07~0.3) -> Cracked / 5~9남음(0.38~0.69) -> LittleCracked / 10~13남음 -> Normal
+
+		if (HealthRatio <= 0.35f)
+		{
+			// 체력이 35% 이하일 때 (심하게 파손)
+			NewState = ETileState::Cracked;
+		}
+		else if (HealthRatio <= 0.70f)
+		{
+			// 체력이 35% 초과 ~ 70% 이하일 때 (살짝 파손)
+			NewState = ETileState::LittleCracked;
+		}
+		else
+		{
+			// 체력이 70% 초과일 때 (정상)
+			NewState = ETileState::Normal;
+		}
+	}
+
+	// 상태가 변했을 때만 네트워크 갱신
+	if (CurrentState != NewState)
+	{
+		CurrentState = NewState;
 		OnRep_TileState();
 	}
 }
 
 void ARaidTile::OnRep_TileState()
 {
-	// 서버에서 상태가 변해 클라이언트로 동기화되면 이 함수가 실행됩니다.
-	// 블루프린트의 시각 효과(이펙트, 머티리얼 변경 등) 이벤트를 호출합니다.
 	UpdateTileVisuals(CurrentState);
 }
