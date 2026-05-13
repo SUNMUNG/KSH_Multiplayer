@@ -8,7 +8,12 @@ public class KSH_Multiplayer : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "GameplayAbilities", "GameplayTags", "GameplayTasks" });
+        PublicDependencyModuleNames.AddRange(new string[] {
+            "Core", "CoreUObject", "Engine", "InputCore",
+            "GameplayAbilities", "GameplayTags", "GameplayTasks",
+            "AIModule",           // AIController, BehaviorTree
+            "NavigationSystem"    // NavMesh (MoveTo)
+        });
 
         PrivateDependencyModuleNames.AddRange(new string[] {  });
 

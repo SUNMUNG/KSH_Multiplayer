@@ -5,57 +5,92 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "GAS/KSHGameplayTags.h"
 #include "PlayerBase.generated.h"
 
 class UGameplayAbility;
+struct FOnAttributeChangeData;
 
-UENUM(BlueprintType)
-enum class EHitReactionState : uint8
-{
-	Normal			UMETA(DisplayName = "Normal"),			// Æò»ó½Ã
-	Flinch			UMETA(DisplayName = "Flinch"),			// ´Ü¼ø °æÁ÷ (¿òÂñ)
-	HitReaction		UMETA(DisplayName = "Hit Reaction"),	// ÇÇ°İÀÌ»ó (³Ë¹é, ¿¡¾îº» µî ¹°¸® ÀÌµ¿)
-	Down			UMETA(DisplayName = "Down"),			// ´Ù¿î (¹Ù´Ú¿¡ ´©¿ò, ±â»ó±â ÇÊ¿ä)
-	StatusEffect	UMETA(DisplayName = "Status Effect")	// »óÅÂÀÌ»ó (±âÀı, µ¿°á µî)
-};
-
+/**
+ * APlayerBase
+ *
+ * GAS ê¸°ë°˜ í”Œë ˆì´ì–´ ìºë¦­í„°.
+ *
+ * [í”¼ê²© ìƒíƒœ ì‹œìŠ¤í…œ]
+ *   EHitReactionState ì—´ê±°í˜• + DOREPLIFETIME ì œê±°.
+ *   ëŒ€ì‹  GAS íƒœê·¸(State.HitReaction.*) ë¥¼ GE HasDuration ìœ¼ë¡œ ë¶€ì—¬.
+ *   GAS ê°€ ë³µì œë¥¼ ë‹´ë‹¹ â†’ BP ì—ì„œ OnDownStateChanged / OnHitReactionChanged ì´ë²¤íŠ¸ë¡œ ë°˜ì‘.
+ *
+ * [ë©”í…Œì˜¤ ìŠ¤íƒ ì‹œìŠ¤í…œ]
+ *   MeteorStackCount ì†ì„±ì´ 3 ì— ë„ë‹¬í•˜ë©´ Event.MeteorStackFull ì„ ë°œì†¡.
+ *   BP_GA_PersonalMeteor ë¥¼ DefaultAbilities ì— ì¶”ê°€í•˜ê³ 
+ *   í•´ë‹¹ GA ì˜ AbilityTriggers ì— Event.MeteorStackFull íƒœê·¸ë¥¼ ë“±ë¡í•˜ë©´ ìë™ í™œì„±í™”ë©ë‹ˆë‹¤.
+ */
 UCLASS()
 class KSH_MULTIPLAYER_API APlayerBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	APlayerBase();
 
-	// [Ãß°¡] GAS ÀÎÅÍÆäÀÌ½º ÇÊ¼ö ¿À¹ö¶óÀÌµå ÇÔ¼ö
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	// [Ãß°¡] ¼­¹ö¿¡¼­ ÄÄÆ÷³ÍÆ®¸¦ ÃÊ±âÈ­ÇÏ±â À§ÇÑ ¿À¹ö¶óÀÌµå
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_Controller() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// ================================================================
+	// GAS í”¼ê²© ìƒíƒœ ì´ë²¤íŠ¸
+	//
+	// ASC ì— í”¼ê²© íƒœê·¸ê°€ ì¶”ê°€/ì œê±°ë  ë•Œ í˜¸ì¶œë©ë‹ˆë‹¤.
+	// BP ì—ì„œ êµ¬í˜„í•´ AnimBP ë¥¼ êµ¬ë™í•˜ì„¸ìš”.
+	// ================================================================
+
+	// State.HitReaction.Down íƒœê·¸ ë³€ê²½ ì‹œ í˜¸ì¶œ (bIsDown=true: ë‹¤ìš´, false: íšŒë³µ)
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS|Combat")
+	void OnDownStateChanged(bool bIsDown);
+
+	// State.HitReaction.HitReaction íƒœê·¸ ë³€ê²½ ì‹œ í˜¸ì¶œ
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS|Combat")
+	void OnHitReactionChanged(bool bIsHitReaction);
+
+	// ================================================================
+	// ë©”í…Œì˜¤ ìŠ¤íƒ (ì™¸ë¶€ ì½ê¸°ìš©)
+	// ================================================================
+
+	UFUNCTION(BlueprintPure, Category = "Combat|MeteorStack")
+	int32 GetMeteorStackCount() const;
+
+	// [Authority Only] ìŠ¤íƒì„ 0 ìœ¼ë¡œ Override GE ë¦¬ì…‹
+	void ResetMeteorStack();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// MeteorStackCount ì†ì„± ë³€ê²½ ì½œë°± (PossessedBy ì—ì„œ ASC ë¸ë¦¬ê²Œì´íŠ¸ì— ë“±ë¡)
+	void OnMeteorStackCountChanged(const FOnAttributeChangeData& Data);
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// GAS íƒœê·¸ ë³€ê²½ ì½œë°± (BeginPlay ì—ì„œ RegisterGameplayTagEvent ë¡œ ë“±ë¡)
+	void OnDownTagChanged(const FGameplayTag Tag, int32 Count);
+	void OnHitReactionTagChanged(const FGameplayTag Tag, int32 Count);
 
+	// ================================================================
+	// GAS ì»´í¬ë„ŒíŠ¸
+	// ================================================================
 
-protected:
-	// [Ãß°¡] ¾îºô¸®Æ¼ ½Ã½ºÅÛ ÄÄÆ÷³ÍÆ® º»Ã¼
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
-	class UAbilitySystemComponent* AbilitySystemComponent;
+	UAbilitySystemComponent* AbilitySystemComponent;
 
-	// ¿¡µğÅÍ¿¡¼­ ºÎ¿©ÇÒ ±â¼ú ¸®½ºÆ®¸¦ °í¸¦ ¼ö ÀÖ°Ô ÇÕ´Ï´Ù.
+	// ì—ë””í„°ì—ì„œ ê¸°ë³¸ ë¶€ì—¬í•  ì–´ë¹Œë¦¬í‹° ëª©ë¡.
+	// BP_GA_PersonalMeteor ë¥¼ ì¶”ê°€í•˜ê³  AbilityTriggers: Event.MeteorStackFull ì„¤ì •.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
 	class UBaseAttributeSet* BaseAttributeSet;
 
+public:
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

@@ -1,56 +1,66 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Object/Meteor.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Tile/RaidTile.h"
 #include "DrawDebugHelpers.h"
+#include "Player/PlayerBase.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayEffect.h"
+#include "GAS/AttributeSet/BaseAttributeSet.h"
+#include "GAS/KSHGameplayTags.h"
 
 AMeteor::AMeteor()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true; // ¸ŞÅ×¿ÀÀÇ À§Ä¡¿Í Æø¹ßÀº ¼­¹ö°¡ ÅëÁ¦ÇÕ´Ï´Ù.
+	bReplicates = true;
 	SetReplicateMovement(true);
 
-	// 1. Ãæµ¹ ÄÄÆ÷³ÍÆ® ¼¼ÆÃ
+	// 1. ì¶©ëŒ ì»´í¬ë„ŒíŠ¸ ìƒì„±
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(50.0f);
 	CollisionComp->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = CollisionComp;
 
-	// Ãæµ¹ ÀÌº¥Æ® ¹ÙÀÎµù
+	// ì¶©ëŒ ì´ë²¤íŠ¸ ë°”ì¸ë”©
 	CollisionComp->OnComponentHit.AddDynamic(this, &AMeteor::OnHit);
 
-	// 2. ¸Ş½¬ ÄÄÆ÷³ÍÆ® ¼¼ÆÃ
+	// 2. ë©”ì‹œ ì»´í¬ë„ŒíŠ¸ ìƒì„±
 	MeteorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeteorMesh"));
 	MeteorMesh->SetupAttachment(RootComponent);
 
-	// 3. ¹ß»çÃ¼ ³«ÇÏ ¹«ºê¸ÕÆ® ¼¼ÆÃ (Á÷Á¢ TickÀ¸·Î ³»¸®Áö ¾Ê°í ¿£Áø ±â´É È°¿ë)
+	// 3. ë°œì‚¬ì²´ ì´ë™ ì»´í¬ë„ŒíŠ¸ ìƒì„± (Tick ì—†ì´ ë¬¼ë¦¬ ê¸°ë°˜ ì´ë™ ì²˜ë¦¬)
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 250.0f; // ¶³¾îÁö´Â ¼Óµµ
+	ProjectileMovement->InitialSpeed = 250.0f;
 	ProjectileMovement->MaxSpeed = 250.0f;
 	ProjectileMovement->ProjectileGravityScale = 1.0f;
 
-	// ¾Æºê·¼½´µå 6°ü¹®À» À§ÇÑ Æø¹ß ¹İ°æ (Å¸ÀÏÀÌ 1000 »çÀÌÁîÀÏ ¶§ ±âÁØ)
+	// ê¸°ë³¸ í­ë°œ ë°˜ê²½ (íƒ€ì¼ 6ê°œ ì •ë„ ì»¤ë²„)
 	ExplosionRadius = 600.0f;
-
 	MeteorDamage = 1;
+
+	// ë¸”ë£¨ ë©”í…Œì˜¤ ê¸°ë³¸ê°’: MaxHealthì˜ 80% ë°ë¯¸ì§€
+	DamagePercentage = 0.8f;
+
+	// ìˆ˜í‰ 1200 cm/s, ìˆ˜ì§ 600 cm/s ë„‰ë°± (ì—ë””í„°ì—ì„œ ì¡°ì • ê°€ëŠ¥)
+	KnockbackStrength = 1200.0f;
+	KnockbackUpwardStrength = 600.0f;
 }
 
 void AMeteor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// »ı¼ºµÇÀÚ¸¶ÀÚ ¼öÁ÷ ¾Æ·¡(ZÃà)·Î ¶³¾îÁö°Ô ¸¸µì´Ï´Ù.
+	// ìŠ¤í°ë˜ìë§ˆì ì•„ë˜(-Zì¶•)ë¡œ ë‚™í•˜ ì‹œì‘
 	ProjectileMovement->Velocity = FVector(0.f, 0.f, -1.f) * ProjectileMovement->InitialSpeed;
 }
 
 void AMeteor::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// Ãæµ¹ ¿¬»ê°ú Å¸ÀÏ ÆÄ±«´Â ¿ÀÁ÷ '¼­¹ö'¿¡¼­¸¸ ¼öÇàÇØ¾ß ÇÕ´Ï´Ù.
+	// ì¶©ëŒ ì²˜ë¦¬ëŠ” ì„œë²„ ê¶Œí•œì—ì„œë§Œ ìˆ˜í–‰ (íƒ€ì¼ íŒŒê´´, í”Œë ˆì´ì–´ í”¼ê²© ëª¨ë‘ ì„œë²„ì—ì„œ)
 	if (HasAuthority())
 	{
 		Explode();
@@ -63,18 +73,15 @@ void AMeteor::Explode()
 
 	DrawDebugSphere(GetWorld(), ExplosionLocation, ExplosionRadius, 32, FColor::Red, false, 2.0f);
 
-	// Ãæµ¹ °á°ú¸¦ ´ãÀ» ¹è¿­
 	TArray<FOverlapResult> OverlapResults;
-
-	// Æø¹ß ¹İ°æ ¼³Á¤ (±¸ ¸ğ¾ç)
 	FCollisionShape SphereShape = FCollisionShape::MakeSphere(ExplosionRadius);
 
-	// Å¸ÀÏµéÀÌ WorldDynamic ¶Ç´Â WorldStatic Ã¤³ÎÀÌ¶ó°í °¡Á¤
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	// í”Œë ˆì´ì–´(Pawn) ê°ì§€ë¥¼ ìœ„í•´ Pawn ì±„ë„ ì¶”ê°€
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
 
-	// Æø¹ß À§Ä¡¸¦ Áß½ÉÀ¸·Î ±¸Çü Ãæµ¹ °Ë»ç ½ÇÇà
 	bool bHit = GetWorld()->OverlapMultiByObjectType(
 		OverlapResults,
 		ExplosionLocation,
@@ -85,19 +92,110 @@ void AMeteor::Explode()
 
 	if (bHit)
 	{
+		// ê°™ì€ ì•¡í„°ì˜ ì—¬ëŸ¬ ì»´í¬ë„ŒíŠ¸ ì¤‘ë³µ ê°ì§€ ë°©ì§€
+		TSet<AActor*> HitActors;
+
 		for (const FOverlapResult& Result : OverlapResults)
 		{
-			ARaidTile* HitTile = Cast<ARaidTile>(Result.GetActor());
+			AActor* HitActor = Result.GetActor();
+			if (!HitActor || HitActors.Contains(HitActor)) continue;
+			HitActors.Add(HitActor);
+
+			// --- íƒ€ì¼ ì²˜ë¦¬ ---
+			ARaidTile* HitTile = Cast<ARaidTile>(HitActor);
 			if (HitTile)
 			{
-				// [¼öÁ¤] ¹«Á¶°Ç 1ÀÌ ¾Æ´Ï¶ó, ÀÚ½ÅÀÇ µ¥¹ÌÁö º¯¼ö¸¦ Àü´ŞÇÕ´Ï´Ù.
 				HitTile->TakeDamage(MeteorDamage);
+				continue;
+			}
+
+			// --- í”Œë ˆì´ì–´ ì²˜ë¦¬ (GAS ë°ë¯¸ì§€ + ë„‰ë°±) ---
+			APlayerBase* HitPlayer = Cast<APlayerBase>(HitActor);
+			if (HitPlayer)
+			{
+				ApplyDamageToPlayer(HitPlayer, ExplosionLocation);
 			}
 		}
 	}
 
-	// TODO: ºí·çÇÁ¸°Æ®¿¡¼­ ÆÄ±« ÀÌÆåÆ®(³ªÀÌ¾Æ°¡¶ó)³ª »ç¿îµå¸¦ Àç»ıÇÒ ¼ö ÀÖµµ·Ï ¸ÖÆ¼Ä³½ºÆ® ·ÎÁ÷ Ãß°¡ °¡´É
-
-	// Æø¹ßÀÌ ³¡³µÀ¸¹Ç·Î ¸ŞÅ×¿À »èÁ¦
 	Destroy();
+}
+
+void AMeteor::ApplyDamageToPlayer(APlayerBase* HitPlayer, const FVector& ExplosionLocation)
+{
+	// ì´ í•¨ìˆ˜ëŠ” OnHit â†’ Explode ê²½ë¡œë¡œë§Œ í˜¸ì¶œë˜ë©°, í•­ìƒ ì„œë²„ ê¶Œí•œ ì»¨í…ìŠ¤íŠ¸ ì•ˆì— ìˆìŒ
+	UAbilitySystemComponent* TargetASC = HitPlayer->GetAbilitySystemComponent();
+	if (!TargetASC) return;
+
+	// =========================================================
+	// [1ë‹¨ê³„] GAS í¼ì„¼í‹°ì§€ ë°ë¯¸ì§€ ì ìš©
+	//
+	// MaxHealthë¥¼ ì§ì ‘ ì½ì–´ ë™ì  GameplayEffectë¥¼ ìƒì„±.
+	// Blueprint GE ì—ì…‹ ì—†ì´ ìˆœìˆ˜ C++ë¡œ GAS íŒŒì´í”„ë¼ì¸ì„ í†µí•´ ì²˜ë¦¬í•˜ë¯€ë¡œ
+	// PreAttributeChangeì˜ í´ë¨í•‘ ë“±ì´ ëª¨ë‘ ì •ìƒ ì‘ë™.
+	// =========================================================
+	const float MaxHealth    = TargetASC->GetNumericAttribute(UBaseAttributeSet::GetMaxHealthAttribute());
+	const float DamageAmount = MaxHealth * DamagePercentage;
+
+	// ëŸ°íƒ€ì„ì— ì¦‰ì‹œ(Instant) GameplayEffectë¥¼ ë™ì ìœ¼ë¡œ ìƒì„±
+	UGameplayEffect* DamageGE = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TEXT("BlueMeteorInstantDamage")));
+	DamageGE->DurationPolicy = EGameplayEffectDurationType::Instant;
+
+	FGameplayModifierInfo& Modifier = DamageGE->Modifiers.AddDefaulted_GetRef();
+	Modifier.Attribute        = UBaseAttributeSet::GetHealthAttribute();
+	Modifier.ModifierOp       = EGameplayModOp::Additive;
+	Modifier.ModifierMagnitude = FScalableFloat(-DamageAmount);
+
+	FGameplayEffectContextHandle Context = TargetASC->MakeEffectContext();
+	Context.AddSourceObject(this);
+
+	FGameplayEffectSpec Spec(DamageGE, Context, 1.0f);
+	TargetASC->ApplyGameplayEffectSpecToSelf(Spec);
+
+	// [DEBUG] ë°ë¯¸ì§€ ì ìš© ê²°ê³¼ ì¶œë ¥
+	const float HealthAfter = TargetASC->GetNumericAttribute(UBaseAttributeSet::GetHealthAttribute());
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange,
+		FString::Printf(TEXT("[Meteor] MaxHP=%.0f | Damage=%.0f (%.0f%%) | HP After=%.0f"),
+			MaxHealth, DamageAmount, DamagePercentage * 100.f, HealthAfter));
+
+	// =========================================================
+	// [2ë‹¨ê³„] ë¬¼ë¦¬ ë„‰ë°± â€” LaunchCharacter
+	//
+	// í­ë°œ ì§€ì  â†’ í”Œë ˆì´ì–´ ë°©í–¥ìœ¼ë¡œ ìˆ˜í‰ ë²¡í„°ë¥¼ êµ¬í•˜ê³ ,
+	// ë³„ë„ ìˆ˜ì§ ê°•ë„ë¥¼ ë”í•´ ë¹„ìŠ¤ë“¬íˆ ìœ„ë¡œ ë‚ ì•„ê°€ê²Œ ë§Œë“¦.
+	// LaunchCharacterëŠ” CharacterMovementë¥¼ í†µí•´ ì„œë²„â†’í´ë¼ ìë™ ë³µì œ.
+	// =========================================================
+	FVector KnockbackDir  = (HitPlayer->GetActorLocation() - ExplosionLocation).GetSafeNormal2D();
+	FVector LaunchVelocity = KnockbackDir * KnockbackStrength + FVector::UpVector * KnockbackUpwardStrength;
+
+	// bXYOverride=true, bZOverride=true: í˜„ì¬ ì†ë„ë¥¼ ë¬´ì‹œí•˜ê³  ì™„ì „íˆ ë®ì–´ì”€
+	HitPlayer->LaunchCharacter(LaunchVelocity, true, true);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
+		FString::Printf(TEXT("[Meteor] Knockback Speed=%.0f"), LaunchVelocity.Size()));
+
+	// =========================================================
+	// [3ë‹¨ê³„] GAS í”¼ê²© íƒœê·¸ ë¶€ì—¬ (HasDuration GE)
+	//
+	// DamagePercentage >= 50% â†’ State.HitReaction.Down (3ì´ˆ)
+	// ë¯¸ë§Œ                    â†’ State.HitReaction.HitReaction (1.5ì´ˆ)
+	// GAS ê°€ ë³µì œ ë‹´ë‹¹, GE ë§Œë£Œ ì‹œ íƒœê·¸ ìë™ ì œê±°
+	// =========================================================
+	const bool   bDown       = (DamagePercentage >= 0.5f);
+	const FGameplayTag HitTag = bDown ? TAG_State_HitReaction_Down : TAG_State_HitReaction_HitReaction;
+	const float  TagDuration  = bDown ? 3.0f : 1.5f;
+
+	UGameplayEffect* HitGE = NewObject<UGameplayEffect>(GetTransientPackage(), NAME_None);
+	HitGE->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	HitGE->DurationMagnitude = FScalableFloat(TagDuration);
+	HitGE->InheritableGrantedTagsContainer.Added.AddTag(HitTag);
+
+	FGameplayEffectContextHandle HitCtx = TargetASC->MakeEffectContext();
+	HitCtx.AddSourceObject(this);
+	FGameplayEffectSpec HitSpec(HitGE, HitCtx, 1.0f);
+	TargetASC->ApplyGameplayEffectSpecToSelf(HitSpec);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green,
+		FString::Printf(TEXT("[Meteor] HitTag â†’ %s (%.1fs) | %s"),
+			*HitTag.ToString(), TagDuration, *HitPlayer->GetName()));
 }

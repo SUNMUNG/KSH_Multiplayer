@@ -1,33 +1,39 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/AttributeSet/BaseAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 
 UBaseAttributeSet::UBaseAttributeSet()
 {
-	// ±âº»°ª ÃÊ±âÈ­
+	// ê¸°ë³¸ê°’ ì´ˆê¸°í™”
 	InitHealth(100.f);
 	InitMaxHealth(100.f);
+	InitMeteorStackCount(0.f);
 }
 
 void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// GAS Àü¿ë µ¿±âÈ­ ¸ÅÅ©·Î (Ç×»ó Å¬¶óÀÌ¾ğÆ®¿¡ µ¿±âÈ­µÇµµ·Ï ¼³Á¤)
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	// í•­ìƒ í´ë¼ì´ì–¸íŠ¸ì— ë³µì œë˜ë„ë¡ ì„¤ì • (REPNOTIFY_Always: ê°’ì´ ê°™ì•„ë„ OnRep í˜¸ì¶œ)
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Health,           COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxHealth,        COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MeteorStackCount, COND_None, REPNOTIFY_Always);
 }
 
 void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	// Ã¼·ÂÀÌ º¯°æµÇ·Á°í ÇÒ ¶§, 0 ~ MaxHealth »çÀÌ·Î ¼öÄ¡¸¦ °­Á¦ °íÁ¤ÇÕ´Ï´Ù.
+	// ì²´ë ¥ì´ ë³€í™”í•  ë•Œ, 0 ~ MaxHealth ì‚¬ì´ë¡œ ê°’ì„ ê°•ì œë¡œ í´ë¨í•‘
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
+	}
+	// ìŠ¤íƒ ì¹´ìš´íŠ¸ëŠ” 0 ~ 10 ë²”ìœ„ë¡œ í´ë¨í•‘ (Override GEë¡œ ë¦¬ì…‹ ì‹œ ìŒìˆ˜ ë°©ì§€)
+	else if (Attribute == GetMeteorStackCountAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, 10.0f);
 	}
 }
 
@@ -39,4 +45,9 @@ void UBaseAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 void UBaseAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MaxHealth, OldMaxHealth);
+}
+
+void UBaseAttributeSet::OnRep_MeteorStackCount(const FGameplayAttributeData& OldMeteorStackCount)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MeteorStackCount, OldMeteorStackCount);
 }

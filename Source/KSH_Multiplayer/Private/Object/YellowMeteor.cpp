@@ -1,13 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Object/YellowMeteor.h"
 
 AYellowMeteor::AYellowMeteor()
 {
-	// ¾Æºê·¼½´µåÀÇ ³ë¶õ ¸ÞÅ×¿À´Â ¹üÀ§°¡ ¸Å¿ì ³Ð°í, Å¸ÀÏ¿¡ 3ÀÇ µ¥¹ÌÁö¸¦ ÁÝ´Ï´Ù.
+	// ì•„ë¸Œë ìŠˆë“œ ë…¸ëž‘ ë©”í…Œì˜¤: í­ë°œ ë°˜ê²½ì´ ë„“ì–´ íƒ€ì¼ ì•½ 3ê°œ ì •ë„ë¥¼ ì»¤ë²„í•¨
 	ExplosionRadius = 1700.0f;
 
-	// Å¸ÀÏ 3Ä­ÀÇ Ã¼·ÂÀ» ÇÑ ¹ø¿¡ ³¯·Á¹ö¸³´Ï´Ù.
+	// íƒ€ì¼ 3ì¹¸ì˜ ì²´ë ¥ì„ í•œ ë²ˆì— ê¹Žì„ ìˆ˜ ìžˆëŠ” ë°ë¯¸ì§€
 	MeteorDamage = 3;
 }

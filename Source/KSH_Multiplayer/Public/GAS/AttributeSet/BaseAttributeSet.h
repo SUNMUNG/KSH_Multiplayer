@@ -13,39 +13,56 @@
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
 /**
- * 
+ * UBaseAttributeSet
+ *
+ * í”Œë ˆì´ì–´ì™€ ë³´ìŠ¤ê°€ ê³µìœ í•˜ëŠ” GAS ì–´íŠ¸ë¦¬ë·°íŠ¸ ì„¸íŠ¸.
+ * Health, MaxHealth: ì²´ë ¥ ì‹œìŠ¤í…œ
+ * MeteorStackCount: ë³´ìŠ¤ ë°€ì¹˜ê¸° í”¼ê²© ìŠ¤íƒ ì¹´ìš´í„°
  */
 UCLASS()
 class KSH_MULTIPLAYER_API UBaseAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-	
 
 public:
 	UBaseAttributeSet();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	// [ÇÙ½É] Ã¼·Â È¸º¹ÀÌ³ª µ¥¹ÌÁö·Î ÀÎÇØ ¼öÄ¡°¡ º¯ÇÏ±â Á÷Àü¿¡ Á¦ÇÑ(Clamp)À» °Å´Â ÇÔ¼ö
+	// ì²´ë ¥ íšŒë³µì´ë‚˜ ì˜¤ë²„íˆíŠ¸ì—ì„œ ë‚´ë ¤ê°ˆ ìˆ˜ ìˆë„ë¡ ë²”ìœ„ë¥¼ ì œí•œ(Clamp)í•˜ëŠ” í•¨ìˆ˜
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
-	// --- [°øÅë ½ºÅÈ Á¤ÀÇ] ---
+	// ================================================================
+	// ì–´íŠ¸ë¦¬ë·°íŠ¸ ê°’ ì„ ì–¸
+	// ================================================================
 
-	// 1. ÇöÀç Ã¼·Â
+	// 1. í˜„ì¬ ì²´ë ¥
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_Health)
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Health)
 
-		// 2. ÃÖ´ë Ã¼·Â
-		UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_MaxHealth)
+	// 2. ìµœëŒ€ ì²´ë ¥
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxHealth)
 
-		// --- [³×Æ®¿öÅ© µ¿±âÈ­ ÇÔ¼ö] ---
-		UFUNCTION()
+	// 3. ë©”í…Œì˜¤ ìŠ¤íƒ ì¹´ìš´í„° (ë³´ìŠ¤ ë°€ì¹˜ê¸° í”¼ê²© ì‹œ +1, 3ê°œ ë„ë‹¬ ì‹œ ê°œì¸ ë©”í…Œì˜¤ ë°œë™)
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_MeteorStackCount)
+	FGameplayAttributeData MeteorStackCount;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MeteorStackCount)
+
+	// ================================================================
+	// RepNotify í•¨ìˆ˜
+	// ================================================================
+
+	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth);
 
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+
+	UFUNCTION()
+	void OnRep_MeteorStackCount(const FGameplayAttributeData& OldMeteorStackCount);
 };

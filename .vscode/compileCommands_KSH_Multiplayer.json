@@ -1,0 +1,138 @@
+[
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\KSH_Multiplayer.Build.cs",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\KSH_Multiplayer.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\KSH_Multiplayer.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\GAS\\AttributeSet\\BaseAttributeSet.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\Object\\Meteor.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\Object\\YellowMeteor.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\Player\\PlayerBase.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\Test.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\Tile\\RaidTile.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Private\\Tile\\TileManager.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\GAS\\AttributeSet\\BaseAttributeSet.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\Object\\Meteor.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\Object\\YellowMeteor.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\Player\\PlayerBase.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\Test.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\Tile\\RaidTile.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\Source\\KSH_Multiplayer\\Public\\Tile\\TileManager.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+			"@C:\\Users\\tomat\\Documents\\GitHub\\KSH_Multiplayer\\.vscode\\compileCommands_KSH_Multiplayer\\KSH_Multiplayer.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	}
+]

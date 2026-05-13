@@ -9,6 +9,7 @@
 class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
+class APlayerBase;
 
 UCLASS()
 class KSH_MULTIPLAYER_API AMeteor : public AActor
@@ -19,35 +20,48 @@ public:
 	AMeteor();
 
 protected:
-
-	// ¶¥(¶Ç´Â Å¸ÀÏ)¿¡ ºÎµúÇûÀ» ¶§ È£ÃâµÉ ÇÔ¼ö
+	// ì¶©ëŒ(ë˜ëŠ” íƒ€ì¼)ì— ë‹¿ì•˜ì„ ë•Œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	// Æø¹ß ¹× Å¸ÀÏ °Ë»ö ·ÎÁ÷
+	// í­ë°œ í›„ íƒ€ì¼ ê²€ìƒ‰Â·ì²˜ë¦¬
 	void Explode();
 
 protected:
 	virtual void BeginPlay() override;
 
-	// Ãæµ¹ ÆÇÁ¤À» ´ã´çÇÒ ·çÆ® ÄÄÆ÷³ÍÆ®
+	// ì¶©ëŒ ë²”ìœ„ë¥¼ ì²˜ë¦¬í•˜ëŠ” ìŠ¤í”¼ì–´ ì»´í¬ë„ŒíŠ¸
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USphereComponent* CollisionComp;
 
-	// ´«¿¡ º¸ÀÏ ¸ŞÅ×¿À ¸Ş½¬
+	// ì‹œê° í‘œí˜„ìš© ìŠ¤íƒœí‹± ë©”ì‹œ
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* MeteorMesh;
 
-	// ºÎµå·¯¿î ³«ÇÏ¸¦ À§ÇÑ ¹ß»çÃ¼ ÄÄÆ÷³ÍÆ®
+	// ë¶€ë“œëŸ½ê²Œ ë‚™í•˜í•˜ëŠ” ë°œì‚¬ì²´ ì´ë™ ì»´í¬ë„ŒíŠ¸
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UProjectileMovementComponent* ProjectileMovement;
 
-	// Æø¹ß ¹İ°æ (¿¡µğÅÍ¿¡¼­ ¼öÁ¤ °¡´É)
+	// í­ë°œ ë°˜ê²½ (ì—ë””í„°ì—ì„œ ì¡°ì • ê°€ëŠ¥)
 	UPROPERTY(EditAnywhere, Category = "Meteor")
 	float ExplosionRadius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meteor")
 	int32 MeteorDamage;
 
+	// í”Œë ˆì´ì–´ MaxHealth ëŒ€ë¹„ ë°ë¯¸ì§€ ë¹„ìœ¨ (0.8 = 80%)
+	UPROPERTY(EditAnywhere, Category = "Meteor|Damage", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float DamagePercentage;
 
+	// ë„‰ë°± ìˆ˜í‰ ê°•ë„ (cm/s)
+	UPROPERTY(EditAnywhere, Category = "Meteor|Knockback")
+	float KnockbackStrength;
+
+	// ë„‰ë°± ìˆ˜ì§ ê°•ë„ (cm/s) â€” ìœ„ë¡œ íŠ•ê²¨ì§€ëŠ” ì •ë„
+	UPROPERTY(EditAnywhere, Category = "Meteor|Knockback")
+	float KnockbackUpwardStrength;
+
+private:
+	// [ì„œë²„ ì „ìš©] ë‹¨ì¼ í”Œë ˆì´ì–´ì—ê²Œ GAS ë°ë¯¸ì§€ì™€ ë„‰ë°± + í”¼ê²© íƒœê·¸ GE ì ìš©
+	void ApplyDamageToPlayer(APlayerBase* HitPlayer, const FVector& ExplosionLocation);
 };

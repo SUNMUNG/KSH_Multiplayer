@@ -1,0 +1,8 @@
+# .claudeignore 파일 
+Intermediate/
+Saved/
+Binaries/
+DerivedDataCache/
+Build/
+.vs/
+Content/  # C++ 아키텍처와 로직만 다룬다면 무거운 에셋 폴더는 막아두는 것이 좋습니다.

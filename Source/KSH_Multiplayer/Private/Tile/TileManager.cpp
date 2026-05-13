@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Tile/TileManager.h"
 #include "Tile/RaidTile.h"
 
@@ -9,14 +8,14 @@ ATileManager::ATileManager()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
-	TileSize = 1000.f; // ÀÓ½Ã Å¸ÀÏ Å©±â (ºí·çÇÁ¸°Æ®¿¡¼­ Å¥ºê Å©±â¿¡ ¸ÂÃç Á¶Àı)
+	TileSize = 1000.f; // ì„ì‹œ íƒ€ì¼ í¬ê¸° (ì—ë””í„°ì—ì„œ íƒ€ì¼ ë©”ì‹œ í¬ê¸°ì— ë§ê²Œ ì¡°ì •)
 }
 
 void ATileManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ¸Ê(Å¸ÀÏ) »ı¼ºÀº ¹«Á¶°Ç ¼­¹ö¿¡¼­¸¸ ¼öÇàÇØ¾ß ÇÕ´Ï´Ù.
+	// íƒ€ì¼(ë§µ) ìƒì„±ì€ ì„œë²„ì—ì„œë§Œ ìˆ˜í–‰í•´ì•¼ í•¨
 	if (HasAuthority())
 	{
 		GenerateGrid();
@@ -27,20 +26,20 @@ void ATileManager::GenerateGrid()
 {
 	if (!TileClass) return;
 
-	// 3x3 ±×¸®µå ·çÇÁ
+	// 3x3 ê·¸ë¦¬ë“œ ìƒì„±
 	for (int32 x = -1; x <= 1; ++x)
 	{
 		for (int32 y = -1; y <= 1; ++y)
 		{
-			// 1. ¸Å´ÏÀú Áß½ÉÀ¸·ÎºÎÅÍÀÇ »ó´ëÀûÀÎ °Å¸®(Local Offset)¸¦ ¸ÕÀú °è»êÇÕ´Ï´Ù.
+			// 1. ë§¤ë‹ˆì € ì¤‘ì‹¬ìœ¼ë¡œë¶€í„°ì˜ ë¡œì»¬ ì˜¤í”„ì…‹ ê³„ì‚°
 			FVector LocalOffset = FVector(x * TileSize, y * TileSize, 0.f);
 
-			// 2. [Áß¿ä] ¸Å´ÏÀúÀÇ ÇöÀç Æ®·£½ºÆûÀ» ±âÁØÀ¸·Î ·ÎÄÃ ÁÂÇ¥¸¦ ¿ùµå ÁÂÇ¥·Î º¯È¯ÇÕ´Ï´Ù.
-			// ÀÌ·¸°Ô ÇÏ¸é ¸Å´ÏÀú°¡ 45µµ µ¹¾Æ°¡ ÀÖÀ¸¸é À§Ä¡°ªµµ ÀÚµ¿À¸·Î 45µµ È¸ÀüµÇ¾î °è»êµË´Ï´Ù.
+			// 2. [ì¤‘ìš”] ë§¤ë‹ˆì €ì˜ ì›”ë“œ íŠ¸ëœìŠ¤í¼ì„ ì ìš©í•˜ì—¬ ë¡œì»¬ ì¢Œí‘œë¥¼ ì›”ë“œ ì¢Œí‘œë¡œ ë³€í™˜
+			// ì´ë ‡ê²Œ í•˜ë©´ ë§¤ë‹ˆì €ë¥¼ 45ë„ ê¸°ìš¸ì¸ ê²½ìš° íƒ€ì¼ë„ ìë™ìœ¼ë¡œ 45ë„ íšŒì „ëœ ìœ„ì¹˜ì— ë°°ì¹˜ë¨
 			FVector SpawnLocation = GetActorTransform().TransformPosition(LocalOffset);
 
-			// 3. Å¸ÀÏ ÀÚÃ¼ÀÇ È¸Àüµµ ¸Å´ÏÀúÀÇ È¸Àü°ú ¸ÂÃä´Ï´Ù.
-			// ¸Å´ÏÀú¸¦ 45µµ µ¹¸± °ÍÀÌ¹Ç·Î, Å¸ÀÏµéµµ ¸Å´ÏÀú¸¦ µû¶ó 45µµ µ¹¾Æ°£ »óÅÂ·Î ½ºÆùµË´Ï´Ù.
+			// 3. íƒ€ì¼ íšŒì „ì€ ë§¤ë‹ˆì €ì˜ íšŒì „ì„ ë”°ë¦„
+			// (ë§¤ë‹ˆì €ê°€ 45ë„ íšŒì „ë˜ì–´ ìˆìœ¼ë©´ íƒ€ì¼ë„ ë™ì¼í•˜ê²Œ ë°°ì¹˜ë¨)
 			FRotator SpawnRotation = GetActorRotation();
 
 			FActorSpawnParameters SpawnParams;
@@ -52,15 +51,15 @@ void ATileManager::GenerateGrid()
 			{
 				SpawnedTiles.Add(NewTile);
 
-				// (0,0) ÁÂÇ¥´Â Áß¾Ó Å¸ÀÏ
+				// (0,0) ì¢Œí‘œì˜ ì¤‘ì•™ íƒ€ì¼
 				if (x == 0 && y == 0)
 				{
 					NewTile->Tags.Add(FName("CenterTile"));
-					NewTile->InitHealth(13); // Áß¾Ó Å¸ÀÏÀº 13´ë ¸Â¾Æ¾ß ºÎ¼­Áü
+					NewTile->InitHealth(13); // ì¤‘ì•™ íƒ€ì¼ì€ 13íšŒ ë§ì•„ì•¼ íŒŒê´´
 				}
 				else
 				{
-					NewTile->InitHealth(3); // ÀÏ¹İ Å¸ÀÏÀº 3´ë ¸Â¾Æ¾ß ºÎ¼­Áü
+					NewTile->InitHealth(3); // ì¼ë°˜ íƒ€ì¼ì€ 3íšŒ ë§ì•„ì•¼ íŒŒê´´
 				}
 			}
 		}
